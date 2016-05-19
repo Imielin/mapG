@@ -1,0 +1,27 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="jumbotron">
+    <h1>GDP per capita visualization</h1>
+  </div>
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+<div align="center">
+    <form action="." method="POST">
+      <select class="form-control"  id="year" name="year">
+          <script>
+          var myDate = new Date();
+          var year = myDate.getFullYear();
+          for(var i = 1960; i < year-1; i++){
+            document.write('<option selected value="'+i+'">'+i+'</option>');
+          }
+          </script>
+        </select>
+        <br>
+      <input class="btn btn-success" type="submit" name="my-form" value="Draw data">
+      <a href="/about" class="btn btn-success" role="button">About</a>
+    </form>
+</div>
+
+
+{% endblock %}

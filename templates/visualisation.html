@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}PKB{% endblock %}
+
+{% block content %}
+ <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <!-- I recommend you host this file on your own, since this will change without warning -->
+  <script src="http://datamaps.github.io/scripts/datamaps.world.min.js?v=1"></script>
+    <div class="page-header">
+    <h1 align="center">GDP per capita <br> Rok: {{year}} <br></h1>
+    </div>
+<div align="center">
+    <form action="." method="POST">
+      <select class="form-control"  id="year" name="year">
+          <script>
+          var myDate = new Date();
+          var y = myDate.getFullYear();
+          for(var i = 1960; i < y-1; i++){
+              if(i=={{year}})
+              {
+                  document.write('<option selected value="' + i + '">' + i + '</option>');
+              }else{
+                  document.write('<option  value="' + i + '">' + i + '</option>');
+              }
+          }
+          </script>
+        </select>
+        <br>
+      <input class="btn btn-success" type="submit" name="my-form" value="Draw data">
+     <a href="/about" class="btn btn-success" role="button">About</a>
+    </form>
+    <div id="chart_div"></div>
+</div>
+  <div id="container1" style="position:relative; left:5%;" >
+     <script>
+       //basic map config with custom fills, mercator projection
+      var map = new Datamap({
+        scope: 'world',
+        element: document.getElementById('container1'),
+        projection: 'equirectangular',
+        height: 700,
+        width: 1000,
+        geographyConfig:{
+            popupTemplate: function(geography, data) { //this function should just return a string
+          return '<div class="hoverinfo"><strong>' + geography.properties.name +'</strong><br>'+'GDP per capita: ' +  data.income + '$'
+            }
+        },
+        fills: {
+            'J': '#8e3222',
+            'I': '#a33927',
+            'H': '#b7402c',
+            'G': '#cc4731',
+            'F': '#d25844',
+            'E': '#dc7d6d',
+            'D': '#6ddc7d',
+            'C': '#59d76b',
+            'B': '#31cc47',
+            'A': '#2cb740',
+            defaultFill: '#000000'
+        },
+        data: {
+            {% for country, income in incomes.iteritems() %}
+             {{country|tojson}}: {"fillKey": 'gt50', "income" :{{income|tojson}} },
+                {% endfor %}
+        }
+      })
+         map.updateChoropleth({
+       {%  for country, color in colors.iteritems() %}
+           {{country|tojson}}: {"fillKey": {{color|tojson}}},
+       {% endfor %}
+       });
+     </script>
+
+      <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+      <script type="text/javascript">
+      google.load('visualization', '1', {'packages':['corechart']});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Country');
+        data.addColumn('number', 'GDP per capita');
+        data.addRows( {{ top|tojson }} );
+        var chart = new google.visualization.ColumnChart(
+                document.getElementById('chart_div'));
+        chart.draw(data, {legend: 'none', vAxis: {baseline: 0} });
+      }
+      </script>
+</div>
+{% endblock %}
+
