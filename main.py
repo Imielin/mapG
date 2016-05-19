@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 from flask_bootstrap import Bootstrap
 import pandas as pd
+import os
 app = Flask(__name__)
 Bootstrap(app)
 
@@ -71,4 +72,5 @@ def page_not_found(error):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
